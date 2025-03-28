@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.itheima.mapper.ClazzMapper">
+
+<!--    根据ID删除班级-->
+    <delete id="deleteById">
+        delete from clazz where id = #{id}
+    </delete>
+
+    <!--    分页查询-->
+    <select id="list" resultType="org.itheima.pojo.Clazz">
+        select
+            c.*,
+            m.name masterName,
+            (case when now() > end_date then '已结课'
+                when  begin_date > now() then '未开班'
+                  else '在读中' end) status
+        from clazz c
+        left join emp m on c.master_id = m.id
+        <where>
+            <if test="name != null and name != ''">
+                c.name like concat('%', #{name}, '%')
+            </if>
+            <if test="begin != null and end != null">
+                and c.end_date between  #{begin} and #{end}
+            </if>
+        </where>
+        order by c.update_time desc
+    </select>
+</mapper>
