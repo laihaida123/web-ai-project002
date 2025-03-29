@@ -42,4 +42,37 @@ public class ClazzController {
         clazzService.deleteById(ids);
         return Result.success();
     }
+    /**
+     * 添加班级
+     */
+    @PostMapping
+    public Result save(@RequestBody Clazz clazz){
+        clazzService.save(clazz);
+        return Result.success();
+    }
+
+    /**
+     * 根据ID查询班级详情
+     */
+    @GetMapping("/{id}")
+    public Result getInfo(@PathVariable Integer id){
+        Clazz clazz = clazzService.getInfo(id);
+        return Result.success(clazz);
+    }
+    /**
+     * 更新班级信息
+     */
+    @PutMapping
+    public Result update(@RequestBody Clazz clazz){
+        clazzService.update(clazz);
+        return Result.success();
+    }
+    /**
+     * 查询全部班级
+     */
+    @GetMapping("/list")
+    public Result findAll(){
+        List<Clazz> clazzList = clazzService.findAll();
+        return Result.success(clazzList);
+    }
 }

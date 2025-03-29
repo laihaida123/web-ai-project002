@@ -2,7 +2,9 @@ package org.itheima.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import org.itheima.exception.BusinessException;
 import org.itheima.mapper.ClazzMapper;
+import org.itheima.mapper.StudentMapper;
 import org.itheima.pojo.Clazz;
 import org.itheima.pojo.PageResult;
 import org.itheima.pojo.Result;
@@ -11,12 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class ClazzServiceImpl implements ClazzSerivce {
     @Autowired
-    ClazzMapper clazzMapper;
+    private ClazzMapper clazzMapper;
+    @Autowired
+    private StudentMapper studentMapper;
     /**
      * 分页查询方法
      * @parampage 页码
@@ -36,6 +41,8 @@ public class ClazzServiceImpl implements ClazzSerivce {
 
         return new PageResult(p.getTotal(), p.getResult());
     }
+
+//    删除班级信息
     @Override
     public void deleteById(Integer ids){
         //1. 查询班级下是否有学员
@@ -45,5 +52,28 @@ public class ClazzServiceImpl implements ClazzSerivce {
         }
         //2. 如果没有, 再删除班级信息
         clazzMapper.deleteById(ids);
+    }
+//    添加班级信息
+    @Override
+    public void save(Clazz clazz){
+        clazz.setCreateTime(LocalDateTime.now());
+        clazz.setUpdateTime(LocalDateTime.now());
+        clazzMapper.insert(clazz);
+    }
+//    根据id查询班级信息
+    @Override
+    public Clazz getInfo(Integer id){
+        return clazzMapper.getInfo(id);
+    }
+//    更新信息
+    @Override
+    public void update(Clazz clazz) {
+        clazz.setUpdateTime(LocalDateTime.now());
+        clazzMapper.update(clazz);
+    }
+//    查询所有班级信息
+    @Override
+    public List<Clazz> findAll() {
+        return clazzMapper.findAll();
     }
 }

@@ -19,5 +19,31 @@ public interface ClazzSerivce {
      */
     PageResult<Clazz> page(String name, LocalDate begin, LocalDate end, Integer page, Integer pageSize);
 
+    /**
+     * 删除班级
+     * @param id
+     */
     void deleteById(Integer ids);
+
+    /**
+     * 添加班级信息
+     * @param clazz
+     */
+    void save(Clazz clazz);
+    /**
+     * 根据ID查询班级详情
+     * @param id
+     * @return
+     */
+    Clazz getInfo(Integer id);
+    /**
+     * 修改班级信息
+     * @param clazz
+     */
+    void update(Clazz clazz);
+    /**
+     * 查询全部班级
+     * @return
+     */
+    List<Clazz> findAll();
 }
