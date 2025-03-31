@@ -3,12 +3,9 @@ package org.itheima.service;
 import org.apache.ibatis.annotations.Param;
 import org.itheima.pojo.Emp;
 import org.itheima.pojo.EmpQueryParam;
+import org.itheima.pojo.LoginInfo;
 import org.itheima.pojo.PageResult;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
 import java.util.List;
 
 
@@ -35,5 +32,12 @@ public interface EmpService {
     Emp getInfo(Integer id);
 
     void update(@Param("emp") Emp emp);
+
+    /**
+     * 员工登录
+     * @param emp
+     * @return
+     */
+    LoginInfo login(Emp emp);
 }
 

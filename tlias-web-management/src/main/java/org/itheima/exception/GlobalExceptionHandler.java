@@ -27,4 +27,12 @@ public class GlobalExceptionHandler {
         String[] arr = errMsg.split(" ");
         return Result.error(arr[2] + "已存在");
     }
+    /**
+     * 声明异常处理的方法 - BusinessException
+     */
+    @ExceptionHandler
+    public Result handleBuinessException(BusinessException businessException) {
+        log.error("服务器异常", businessException);
+        return Result.error(businessException.getMessage());
+    }
 }

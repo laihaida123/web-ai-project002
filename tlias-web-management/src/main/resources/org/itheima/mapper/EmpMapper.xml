@@ -120,10 +120,15 @@
         else '其他' end) pos,
         count(*) num from emp group by job order by num
     </select>
+<!--统计性别人数-->
     <select id="countEmpGenderData" resultType="java.util.Map">
         select
         if(gender = 1,'男性员工','女性员工') name,
         count(*) value from emp group by gender
+    </select>
+<!--    查询用户名密码-->
+    <select id="selectByUsernameAndPassword" resultType="org.itheima.pojo.Emp">
+        select id,username,name, image from emp where username = #{username}
     </select>
 
 </mapper>

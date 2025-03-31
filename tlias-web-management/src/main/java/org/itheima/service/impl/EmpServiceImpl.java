@@ -2,11 +2,13 @@ package org.itheima.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.itheima.mapper.EmpExprMapper;
 import org.itheima.mapper.EmpMapper;
 import org.itheima.pojo.*;
 import org.itheima.service.EmpLogService;
 import org.itheima.service.EmpService;
+import org.itheima.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +16,11 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @Service
 public class EmpServiceImpl implements EmpService {
     @Autowired
@@ -118,6 +123,31 @@ public class EmpServiceImpl implements EmpService {
     public Emp getInfo(Integer id){
         return empMapper.getById(id);
     }
+
+    /**
+     * 登录验证
+     * @param emp
+     * @return
+     */
+    @Override
+    public LoginInfo login(Emp emp) {
+//        1.调用mapper接口，根据用户名和密码查询员工信息
+        Emp e = empMapper.selectByUsernameAndPassword(emp);
+//        2.判断：判断是否存在这个员工，如果存在，组装登录成功信息
+        if(e!=null){
+            log.info("登录成功,员工信息{}",e);
+
+            //生成jwt令牌
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("id", e.getId());
+            claims.put("username", e.getUsername());
+            JwtUtil.generateJwt(claims);
+            return new LoginInfo(e.getId(), e.getUsername(), e.getName(), "");
+        }
+//        3.不存在，返回null
+        return null;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void update(Emp emp) {
