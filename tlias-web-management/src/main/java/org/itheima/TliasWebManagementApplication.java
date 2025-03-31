@@ -3,6 +3,9 @@ package org.itheima;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletComponentScan;
+
+@ServletComponentScan//开启spring对Servlet组件扫描的支持
 @SpringBootApplication
 public class TliasWebManagementApplication {
 

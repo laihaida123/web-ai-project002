@@ -141,8 +141,8 @@ public class EmpServiceImpl implements EmpService {
             Map<String, Object> claims = new HashMap<>();
             claims.put("id", e.getId());
             claims.put("username", e.getUsername());
-            JwtUtil.generateJwt(claims);
-            return new LoginInfo(e.getId(), e.getUsername(), e.getName(), "");
+            String jwt = JwtUtil.generateJwt(claims);
+            return new LoginInfo(e.getId(), e.getUsername(), e.getName(), jwt);
         }
 //        3.不存在，返回null
         return null;

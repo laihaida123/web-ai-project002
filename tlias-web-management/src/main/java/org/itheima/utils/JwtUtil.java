@@ -13,12 +13,11 @@ import java.util.Map;
 public class JwtUtil {
     // 使用 Keys.secretKeyFor(SignatureAlgorithm.HS256) 生成一个足够安全的密钥
     private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private static final long EXPIRATION_TIME = 3600 * 1000 * 12;//十二小时
+    private static final long EXPIRATION_TIME = 12 * 60 * 60 * 1000;//十二小时
     /**
      * 生成 Jwt 令牌
      *
      * @param claims 自定义信息
-     * @param EXPIRATION_TIME 过期时间（毫秒）
      * @return Jwt 令牌
      */
     public static String generateJwt(Map<String, Object> claims) {
@@ -35,10 +34,9 @@ public class JwtUtil {
      * @param token Jwt 令牌
      * @return 自定义信息
      */
-    public static Claims parseJwt(String token) {
-        return Jwts.parserBuilder()
+    public static Claims parseJwt(String token) throws Exception{
+        return Jwts.parser()
                 .setSigningKey(SECRET_KEY) // 指定密钥
-                .build()
                 .parseClaimsJws(token) // 解析令牌
                 .getBody(); // 获得自定义信息
     }
