@@ -3,6 +3,7 @@ package org.itheima.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.ibatis.annotations.Delete;
+import org.itheima.anno.Log;
 import org.itheima.pojo.Dept;
 import org.itheima.pojo.Result;
 import org.itheima.service.DeptService;
@@ -46,6 +47,7 @@ public class DeptController {
 //        return Result.success();
 //    }
     //房市3 前端请求的参数名与方法形参名一致
+    @Log
     @DeleteMapping("/depts")
     public Result delete(Integer id){
 //        System.out.println("删除id部门为：" + id);
@@ -56,6 +58,7 @@ public class DeptController {
     /**
      * 新增部门
      */
+    @Log
     @PostMapping("/depts")
     public Result add(@RequestBody Dept dept){
 //        System.out.println("新增部门信息：" + dept);
@@ -73,6 +76,13 @@ public class DeptController {
         Dept dept = deptService.getById(deptId);
         return Result.success(dept);
     }
+
+    /**
+     * 修改部门信息
+     * @param dept
+     * @return
+     */
+    @Log
     @PutMapping("/depts")
     public Result update(@RequestBody Dept dept){
 //        System.out.println("修改部门：" + dept);
