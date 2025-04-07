@@ -1,12 +1,15 @@
 package org.itheima.filter;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.itheima.utils.CurrentHolder;
 import org.itheima.utils.JwtUtil;
 
+import javax.crypto.Cipher;
 import java.io.IOException;
 @Slf4j
 //@WebFilter(urlPatterns = "/*")//
@@ -34,10 +37,14 @@ public class TokenFilter implements Filter {
             return;
         }
         //5.如果存在，则解析token令牌，解析失败-》返回错误信息（相应401状态码）
-
         try {
-            JwtUtil.parseJwt(token);
+            Claims claims = JwtUtil.parseJwt(token);
+            System.out.println("111111111111111111111111");
+            Integer empid = Integer.valueOf(claims.get("id").toString());
+            CurrentHolder.setCurrentId(empid);//存入
+            log.info("解析token令牌成功，当前用户id为：{},将其存入thredlocal",empid);
         } catch (Exception e) {
+            System.out.println("111111111111111111111111");
             log.info("解析token令牌失败，相应401");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return ;
@@ -45,5 +52,8 @@ public class TokenFilter implements Filter {
         //6.放行，校验通过
         log.info("放行，令牌合法");
         filterChain.doFilter(request, response);
+
+        //7.删除threadlocal的数据
+        CurrentHolder.remove();
     }
 }

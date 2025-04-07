@@ -1,8 +1,10 @@
 package org.itheima.interceptor;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.itheima.utils.CurrentHolder;
 import org.itheima.utils.JwtUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -21,25 +23,32 @@ public class TokenInterceptor implements HandlerInterceptor {
 //            log.info("登录请求，放行");
 //            return true;
 //        }
-        //1.获取请求头中的token
-        String token = request.getHeader("token");
-        //2.判断token是否为空,不存在说明用户还没登录，返沪错误信息，相应401
-        if (token == null || token.isEmpty()) {
-            //3.如果为空，返回错误信息
-            log.info("请求头中没有token令牌,相应401");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
+        try{
+            //1.获取请求头中的token
+            String token = request.getHeader("token");
+            //2.判断token是否为空,不存在说明用户还没登录，返沪错误信息，相应401
+            if (token == null || token.isEmpty()) {
+                //3.如果为空，返回错误信息
+                log.info("请求头中没有token令牌,相应401");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return false;
+            }
+            //4.token存在，则解析token令牌，解析失败-》返回错误信息（相应401状态码）
+            try {
+                Claims claims = JwtUtil.parseJwt(token);
+                Integer empid = Integer.valueOf(claims.get("id").toString());
+                CurrentHolder.setCurrentId(empid);//存入
+                log.info("解析token令牌成功，当前用户id为：{},将其存入thredlocal",empid);
+            } catch (Exception e) {
+                log.info("解析token令牌失败，相应401");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return false;
+            }
+            //6.放行，校验通过
+            log.info("放行，令牌合法");
+            return true;
+        }finally {
+
         }
-        //4.token存在，则解析token令牌，解析失败-》返回错误信息（相应401状态码）
-        try {
-            JwtUtil.parseJwt(token);
-        } catch (Exception e) {
-            log.info("解析token令牌失败，相应401");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        }
-        //6.放行，校验通过
-        log.info("放行，令牌合法");
-        return true;
     }
 }

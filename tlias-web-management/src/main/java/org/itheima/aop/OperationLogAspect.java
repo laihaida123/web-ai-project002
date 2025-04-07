@@ -7,6 +7,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.itheima.mapper.OperateLogMapper;
 import org.itheima.pojo.OperateLog;
+import org.itheima.utils.CurrentHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,7 @@ public class OperationLogAspect {
 
         //构建日志实体
         OperateLog olog = new OperateLog();
-        olog.setOperateEmpId(getCurrentUserId() );
+        olog.setOperateEmpId(getCurrentUserId());
         olog.setOperateTime(LocalDateTime.now());
         olog.setClassName(joinPoint.getTarget().getClass().getName());
         olog.setMethodName(joinPoint.getSignature().getName());
@@ -47,12 +48,14 @@ public class OperationLogAspect {
         log.info("操作日志：{}", olog);
         //保存日志
         operateLogMapper.insert(olog);
+        //7.删除threadlocal的数据
+        CurrentHolder.remove();
         return result;
     }
     private Integer getCurrentUserId() {
     //根据实际情况获取当前登录用户id
     //这个方法需要根据你的安全框架或上下文来实现
-    return 1;//实例返回值
+    return CurrentHolder.getCurrentId();//实例返回值
 }
 }
 
