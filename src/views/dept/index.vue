@@ -2,9 +2,9 @@
 // import { el } from 'element-plus/es/locale';
 import { ref, onMounted } from 'vue'
 import { Axios } from 'axios';
-import { queryAllApi, addApi, queryByIdApi, updateApi } from '@/api/dept'
-import { ElMessage } from 'element-plus'
-
+import { queryAllApi, addApi, queryByIdApi, updateApi, deleteByIdApi } from '@/api/dept'
+import { ElMessage, ElMessageBox } from 'element-plus'
+//import { ElMessage, ElMessageBox } from 'element-plus'
 //钩子函数
 onMounted(() => {
   search();
@@ -49,9 +49,6 @@ const save = async () => {
         } else {//新增
           result = await addApi(dept.value);
         }
-
-
-
         if (result.code == 1) {//成功
           //提示操作成功
           ElMessage.success('操作成功');
@@ -91,6 +88,29 @@ const edit = async (id) => {
   } else {//失败
   }
 }
+//删除
+const delById = async (id) => {
+  //弹出确认框
+  console.log(`Delete item with ID ${id}`);
+  //删除部门时, 需要弹出一个确认框, 如果是确认, 则删除部门
+  ElMessageBox.confirm('这样就删除这个部门了:(   ，sing会高兴的敖', '别删我‘__’', {
+    confirmButtonText: '我就删',
+    cancelButtonText: '我再想想',
+    type: 'warning'
+  }).then(async () => {//确认
+    // 删除部门
+    const result = await deleteByIdApi(id)
+    console.log(result);
+    if (result.code) {
+      ElMessage.success('你真删啊');
+      search();
+    } else {
+      ElMessage.error(result.message);
+    }
+  }).catch( () => {//取消
+    ElMessage.info('谢谢手下留情');
+  })
+};
 </script>
 
 <template>
@@ -107,8 +127,8 @@ const edit = async (id) => {
         <template #default="scope">
           <el-button type="primary" size="small" @click="edit(scope.row.id)"><el-icon>
               <EditPen />
-            </el-icon>编辑</el-button> 
-          <el-button type="primary" size="small"><el-icon>
+            </el-icon>编辑</el-button>
+          <el-button type="danger" size="small" @click="delById(scope.row.id)"><el-icon>
               <Delete />
             </el-icon>删除</el-button>
         </template>

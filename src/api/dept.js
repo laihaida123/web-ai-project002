@@ -20,3 +20,6 @@ export const updateApi = (dept) => {
 }
 
 //删除
+export const deleteByIdApi = (id) => {
+    return request.delete(`/depts?id=${id}`);
+}
