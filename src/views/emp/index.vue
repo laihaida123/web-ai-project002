@@ -4,7 +4,7 @@ import { ref } from 'vue'
 const searchEmp = ref({
   name: '',
   gender: '',
-  date: ''
+  date: []
 })
 
 //查询员工列表
@@ -17,7 +17,7 @@ const clear = () => {
   searchEmp.value = {
     name: '',
     gender: '',
-    date: ''
+    date: []
   }
   search();
 }
@@ -38,7 +38,7 @@ const clear = () => {
       </el-form-item>
       <el-form-item label="入职时间">
         <el-date-picker v-model="searchEmp.date" type="daterange" range-separator="到" start-placeholder="开始日期"
-          end-placeholder="结束日期" />
+          end-placeholder="结束日期" value-format="YYYY-MM-DD" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="search">查询</el-button>
