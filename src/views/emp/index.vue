@@ -49,5 +49,7 @@ const clear = () => {
 </template>
 
 <style scoped>
-
+.container {
+  margin: 15px 0px;
+}
 </style>
