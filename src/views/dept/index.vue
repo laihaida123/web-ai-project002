@@ -6,7 +6,7 @@ import { queryAllApi, addApi } from '@/api/dept'
 import { ElMessage } from 'element-plus'
 
 //钩子函数
-onMounted(()=> {
+onMounted(() => {
   search();
 })//页面加载完毕后执行
 const deptList = ref([])
@@ -31,7 +31,7 @@ const addDept = () => {
   formTitle.value = '新增部门';
   dept.value = { name: '' };
   //重置表单校验规则--提示信息
-  if(!deptFormRef.value){
+  if (!deptFormRef.value) {
     deptFormRef.value.resetFields();
   }
 }
@@ -59,11 +59,10 @@ const save = async () => {
       }
     })
   }
-  
+
 }
-111111111111111111111111111111111111111
 // 表单校验
-const rules = ref  ({
+const rules = ref({
   name: [//require表示必填blur表示离焦，鼠标一放上去就校验
     { required: true, message: '部门名称是必填项奥！！！', trigger: 'blur' },
     { min: 2, max: 10, message: '部门名称长度要在2到10之间奥！！！嘻嘻', trigger: 'blur' },
@@ -95,12 +94,12 @@ const deptFormRef = ref();
     </el-table>
   </div>
   <!-- dialog对话框组件 -->
-   <!-- v-model true显示，false隐藏 -->
-    <!-- rules定义检阅规则，并将检验规则和表单进行绑定 -->
+  <!-- v-model true显示，false隐藏 -->
+  <!-- rules定义检阅规则，并将检验规则和表单进行绑定 -->
   <el-dialog v-model="dialogFormVisible" :title="formTitle" width="500">
     <el-form :model="dept" :rules="rules" ref="deptFormRef">
       <el-form-item label="部门名称" label-width="80px" prop="name">
-        <el-input v-model="dept.name"/>
+        <el-input v-model="dept.name" />
       </el-form-item>
     </el-form>
     <template #footer>
