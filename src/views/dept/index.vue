@@ -2,7 +2,7 @@
 // import { el } from 'element-plus/es/locale';
 import { ref, onMounted } from 'vue'
 import { Axios } from 'axios';
-import { queryAllApi, addApi } from '@/api/dept'
+import { queryAllApi, addApi, queryByIdApi, updateApi } from '@/api/dept'
 import { ElMessage } from 'element-plus'
 
 //钩子函数
@@ -43,7 +43,15 @@ const save = async () => {
   } else {
     deptFormRef.value.validate(async (valid) => {//valid表示是否校验通过，true表示通过
       if (valid) {//通过
-        const result = await addApi(dept.value);
+        let result;
+        if (dept.value.id) {//修改
+          result = await updateApi(dept.value);
+        } else {//新增
+          result = await addApi(dept.value);
+        }
+
+
+
         if (result.code == 1) {//成功
           //提示操作成功
           ElMessage.success('操作成功');
@@ -69,6 +77,20 @@ const rules = ref({
   ]
 })
 const deptFormRef = ref();
+//编辑
+const edit = async (id) => {
+  formTitle.value = '编辑部门';
+  const result = await queryByIdApi(id);
+  if (result.code == 1) {//成功
+    dialogFormVisible.value = true;
+    dept.value = result.data;
+    //重置表单校验规则--提示信息
+    if (!deptFormRef.value) {
+      deptFormRef.value.resetFields();
+    }
+  } else {//失败
+  }
+}
 </script>
 
 <template>
@@ -83,9 +105,9 @@ const deptFormRef = ref();
       <el-table-column prop="updateTime" label="最后操作时间" width="300" align="center" />
       <el-table-column label="操作" align="center">
         <template #default="scope">
-          <el-button type="primary" size="small"><el-icon>
+          <el-button type="primary" size="small" @click="edit(scope.row.id)"><el-icon>
               <EditPen />
-            </el-icon>编辑</el-button>
+            </el-icon>编辑</el-button> 
           <el-button type="primary" size="small"><el-icon>
               <Delete />
             </el-icon>删除</el-button>
@@ -98,6 +120,7 @@ const deptFormRef = ref();
   <!-- rules定义检阅规则，并将检验规则和表单进行绑定 -->
   <el-dialog v-model="dialogFormVisible" :title="formTitle" width="500">
     <el-form :model="dept" :rules="rules" ref="deptFormRef">
+      {{ dept }}
       <el-form-item label="部门名称" label-width="80px" prop="name">
         <el-input v-model="dept.name" />
       </el-form-item>

@@ -9,7 +9,14 @@ export const addApi = (dept) => {
     return request.post('/depts', dept);
 }
 
-//修改
+//根据id查询
+export const queryByIdApi = (id) => {
+    return request.get(`/depts/${id}`);
+}
 
+//修改
+export const updateApi = (dept) => {
+    return request.put('/depts', dept);
+}
 
 //删除
