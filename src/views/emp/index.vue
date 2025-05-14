@@ -1,10 +1,22 @@
 <script setup>
+import { watch } from 'vue';
 import { ref } from 'vue'
 //搜索表单对象
 const searchEmp = ref({
   name: '',
   gender: '',
-  date: []
+  date: [],
+  begin: '',
+  end: ''
+})
+
+//侦听searchemp的date属性
+watch(() => searchEmp.value.date, (newVal, oldVal) => {
+  if (newVal.length == 2) {
+    searchEmp.value.begin = newVal[0];
+    searchEmp.value.end = newVal[1];
+}
+ 
 })
 
 //查询员工列表
@@ -18,9 +30,29 @@ const clear = () => {
     name: '',
     gender: '',
     date: []
+    
   }
   search();
 }
+// watch侦听
+//1.监听一个响应式数据
+// const a = ref('');
+// watch(a, (newVal, oldVal) => {
+//   console.log(`变化后的值：${newVal}, 变化前的值${oldVal}`);
+// })
+// //2.侦听一个对象（侦听对象全部属性）
+// const user = ref({name: '', age: 10});
+// watch(user, (newVal, oldVal) => {
+//   console.log(`变化后的值：${newVal}, 变化前的值${oldVal}`);
+// }),deep(true)
+//3.侦听某个对象的属性
+const user = ref({ name: '', age: 10 });
+watch(
+  () => user.value.name,
+  (newVal, oldVal) => {
+    console.log(`变化后的值：${newVal}, 变化前的值${oldVal}`);
+  }
+)
 </script>
 <!-- TODO: 员工管理增加 -->
 <template>
