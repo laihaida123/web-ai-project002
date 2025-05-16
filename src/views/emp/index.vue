@@ -3,6 +3,14 @@ import { watch } from 'vue';
 import { ref } from 'vue';
 import { queryPageApi } from '@/api/emp'
 import { onMounted } from 'vue';
+
+//元数据
+//职位列表数据
+const jobs = ref([{ name: '班主任', value: 1 }, { name: '讲师', value: 2 }, { name: '学工主管', value: 3 }, { name: '教研主管', value: 4 }, { name: '咨询师', value: 5 }, { name: '其他', value: 6 }])
+//性别列表数据
+const genders = ref([{ name: '男', value: 1 }, { name: '女', value: 2 }])
+
+
 //搜索表单对象
 const searchEmp = ref({
   name: '',
@@ -261,11 +269,7 @@ const beforeAvatarUpload = (rawFile) => {
         <el-col :span="12">
           <el-form-item label="职位">
             <el-select v-model="employee.job" placeholder="请选择职位" style="width: 100%;">
-              <el-option label="班主任" value="1"></el-option>
-              <el-option label="讲师" value="2"></el-option>
-              <el-option label="学工主管" value="3"></el-option>
-              <el-option label="教研主管" value="4"></el-option>
-              <el-option label="咨询师" value="5"></el-option>
+              <el-option v-for="j in jobs" :key="j.value" :label=j.name :value=j.value></el-option>
             </el-select>
           </el-form-item>
         </el-col>
