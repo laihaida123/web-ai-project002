@@ -1,6 +1,8 @@
 <script setup>
 import { watch } from 'vue';
-import { ref } from 'vue'
+import { ref } from 'vue';
+import { queryPageApi } from '@/api/emp'
+import { onMounted } from 'vue';
 //搜索表单对象
 const searchEmp = ref({
   name: '',
@@ -23,12 +25,12 @@ const total = ref(0)//总记录数
 //每页展示记录数
 const handleSizeChange = (val) => {
   console.log(`${val} 条/页`);
-  search()
+  search();
 }
 //页码变化时处理
 const handleCurrentChange = (val) => {
   console.log(`当前页码：${val}`);
-  search()
+  search();
 }
 //侦听searchemp的date属性
 watch(() => searchEmp.value.date, (newVal, oldVal) => {
@@ -41,9 +43,20 @@ watch(() => searchEmp.value.date, (newVal, oldVal) => {
   }
 }
 )
-
+//钩子函数
+onMounted(() => {
+  search();
+})
 //查询员工列表
-const search = () => {
+const search = async () => {
+  const result = await queryPageApi(searchEmp.value.name, searchEmp.value.gender,
+    searchEmp.value.begin, searchEmp.value.end,
+    currentPage.value,pageSize.value
+  );
+  if (result.code) {
+    empList.value = result.data.rows;
+    total.value = result.data.total;
+  }
   console.log(searchEmp.value);
 }
 
@@ -53,7 +66,6 @@ const clear = () => {
     name: '',
     gender: '',
     date: []
-    
   }
   search();
 }
@@ -114,7 +126,7 @@ watch(
   </div>
 
   <!-- 数据展示表格 -->
-  <div>
+  <div class="container">
     <el-table :data="empList" border style="width: 100%">
       <el-table-column type="selection" width="55" align="center"></el-table-column>
       <el-table-column prop="name" label="姓名" width="120" align="center"></el-table-column>
@@ -148,19 +160,42 @@ watch(
         </template>
       </el-table-column>
     </el-table>
-  </div>
+    </div>
 
-  <!-- 分页条 -->
-  <div>
-    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-      v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 30, 40]"
-      layout="total, sizes, prev, pager, next, jumper" :total="total">
-    </el-pagination>
-  </div>
+    <!-- 分页条 -->
+    <div class="container">
+      {{ currentPage }} page has {{ pageSize }}
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[5, 10, 20, 30, 50, 75, 100]"
+        layout="total, sizes, prev, pager, next, jumper" :total="total">
+      </el-pagination>
+    </div>
+    
 </template>
 
 <style scoped>
 .container {
   margin: 10px 0px;
+}
+/* 设置 .container 下的 el-table 行高 */
+.container .el-table th,
+.container .el-table td {
+  /* !important 是 CSS 中的一个特殊规则，
+  用于 强制提升某条样式声明的优先级，
+  使其覆盖其他可能存在的冲突样式 */
+  height: 60px !important;
+  /* 固定高度 */
+  padding: 0 !important;
+  /* 移除默认内边距 */
+  vertical-align: middle !important;
+  /* 内容垂直居中 */
+}
+/* 图片自适应 */
+.container .el-table .avatar {
+  max-height: 50px;
+  /* 限制头像高度 */
+  width: auto;
+  display: block;
+  margin: 0 auto;
 }
 </style>
