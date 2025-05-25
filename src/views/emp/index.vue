@@ -179,6 +179,17 @@ const delExprItem = (index) => {
   employee.value.exprList.splice(index, 1);
 }
 
+// 侦听-employee对象的工作经历消息
+watch(() => employee.value.exprList, (newVal, oldVal) => {
+  if (employee.value.exprList && employee.value.exprList.length > 0) {
+    employee.value.exprList.forEach((expr) => {
+      expr.begin = expr.exprDate[0];
+      expr.end = expr.exprDate[1];
+    }
+  )
+  }
+}, { deep: true })//深度监听
+
 </script>
 <!-- TODO: 员工管理增加 -->
 <!-- 搜索栏 -->
