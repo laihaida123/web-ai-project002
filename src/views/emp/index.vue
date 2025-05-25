@@ -2,13 +2,17 @@
 import { watch } from 'vue';
 import { ref } from 'vue';
 import { queryPageApi } from '@/api/emp'
+import { queryAllApi as queryAllDeptApi } from '@/api/dept'
 import { onMounted } from 'vue';
-
+import { ElMessage } from 'element-plus';
 //元数据
 //职位列表数据
 const jobs = ref([{ name: '班主任', value: 1 }, { name: '讲师', value: 2 }, { name: '学工主管', value: 3 }, { name: '教研主管', value: 4 }, { name: '咨询师', value: 5 }, { name: '其他', value: 6 }])
 //性别列表数据
 const genders = ref([{ name: '男', value: 1 }, { name: '女', value: 2 }])
+//部门列表数据
+const depts = ref([])
+
 
 
 //搜索表单对象
@@ -53,8 +57,16 @@ watch(() => searchEmp.value.date, (newVal, oldVal) => {
 )
 //钩子函数
 onMounted(() => {
-  search();
+  search();//查询员工列表
+  queryAllDepts();//查询所有部门数据
 })
+//查询所以部门数据
+const queryAllDepts = async () => {
+  const result = await queryAllDeptApi();
+  if (result.code) {
+    depts.value = result.data;
+  }
+}
 //查询员工列表
 const search = async () => {
   const result = await queryPageApi(searchEmp.value.name, searchEmp.value.gender,
@@ -132,18 +144,39 @@ const dialogTitle = ref('新增员工')
 //文件上传
 // 图片上传成功后触发
 const handleAvatarSuccess = (response) => {
+  employee.value.image = response.data;
   console.log(response);
 }
 // 文件上传之前触发
+// !== 是 JavaScript 中的 严格不相等运算符（Strict Inequality Operator），
+// 用于比较两个值是否 类型不同 或 值不同。
+// 它与 !=（非严格不相等）的区别在于 不会进行类型转换。
 const beforeAvatarUpload = (rawFile) => {
   if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
-    ElMessage.error('只支持上传图片')
-    return false
+    ElMessage.error('只支持上传图片');
+    return false;
   } else if (rawFile.size / 1024 / 1024 > 10) {
-    ElMessage.error('只能上传10M以内图片')
-    return false
+    ElMessage.error('只能上传10M以内图片');
+    return false;
   }
-  return true
+  return true;
+}
+
+// 添加工作经历
+const addExprItem = () => {
+  employee.value.exprList.push({
+    company: '',
+    job: '',
+    begin: '',
+    end: '',
+    exprDate: []
+  });
+}
+
+
+// 删除工作经历
+const delExprItem = (index) => {
+  employee.value.exprList.splice(index, 1);
 }
 
 </script>
@@ -229,6 +262,7 @@ const beforeAvatarUpload = (rawFile) => {
 
   <!-- 新增/修改员工的对话框 -->
   <el-dialog v-model="dialogVisible" :title="dialogTitle">
+    {{ employee }}
     <el-form :model="employee" label-width="80px">
       <!-- 基本信息 -->
       <!-- 第一行 -->
@@ -285,8 +319,7 @@ const beforeAvatarUpload = (rawFile) => {
         <el-col :span="12">
           <el-form-item label="所属部门">
             <el-select v-model="employee.deptId" placeholder="请选择部门" style="width: 100%;">
-              <el-option label="研发部" value="1"></el-option>
-              <el-option label="市场部" value="2"></el-option>
+              <el-option v-for="d in depts" :key=d.id :label=d.name :value=d.id></el-option>
             </el-select>
           </el-form-item>
         </el-col>
@@ -299,6 +332,8 @@ const beforeAvatarUpload = (rawFile) => {
       </el-row>
 
       <!-- 第五行 -->
+      <!-- :on-success="handleAvatarSuccess" 文件上传成功后，将图片的URL地址，保存到员工对象中 -->
+      <!-- :before-upload=“beforeAvatarUpload"文件上传之前，把图片上传到服务器，并把图片的URL地址，保存到员工对象中 -->
       <el-row :gutter="20">
         <el-col :span="24">
           <el-form-item label="头像">
@@ -319,35 +354,35 @@ const beforeAvatarUpload = (rawFile) => {
       <el-row :gutter="10">
         <el-col :span="24">
           <el-form-item label="工作经历">
-            <el-button type="success" size="small" @click="">+ 添加工作经历</el-button>
+            <el-button type="success" size="small" @click="addExprItem">+ 添加工作经历</el-button>
           </el-form-item>
         </el-col>
       </el-row>
 
       <!-- 第七行 ...  工作经历 -->
-      <el-row :gutter="3">
+      <el-row :gutter="3" v-for="(expr,index) in employee.exprList">
         <el-col :span="10">
           <el-form-item size="small" label="时间" label-width="80px">
-            <el-date-picker type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
-              format="YYYY-MM-DD" value-format="YYYY-MM-DD"></el-date-picker>
+            <el-date-picker type="daterange" v-model="expr.exprDate" range-separator="至" start-placeholder="开始日期"
+              end-placeholder="结束日期" format="YYYY-MM-DD" value-format="YYYY-MM-DD"></el-date-picker>
           </el-form-item>
         </el-col>
 
         <el-col :span="6">
           <el-form-item size="small" label="公司" label-width="60px">
-            <el-input placeholder="请输入公司名称"></el-input>
+            <el-input placeholder="请输入公司名称" v-model="expr.company"></el-input>
           </el-form-item>
         </el-col>
 
         <el-col :span="6">
           <el-form-item size="small" label="职位" label-width="60px">
-            <el-input placeholder="请输入职位"></el-input>
+            <el-input placeholder="请输入职位" v-model="expr.job"></el-input>
           </el-form-item>
         </el-col>
 
         <el-col :span="2">
           <el-form-item size="small" label-width="0px">
-            <el-button type="danger">- 删除</el-button>
+            <el-button type="danger" @click="delExprItem(index)">- 删除</el-button>
           </el-form-item>
         </el-col>
       </el-row>
