@@ -1,7 +1,7 @@
 <script setup>
 import { watch } from 'vue';
 import { ref } from 'vue';
-import { queryPageApi } from '@/api/emp'
+import { queryPageApi, addApi } from '@/api/emp'
 import { queryAllApi as queryAllDeptApi } from '@/api/dept'
 import { onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
@@ -122,6 +122,18 @@ watch(
 const addEmp = () => {
   dialogVisible.value = true;
   dialogTitle.value = '新增员工';
+  employee.value = {//清空
+    username: '',
+    name: '',
+    gender: '',
+    phone: '',
+    job: '',
+    salary: '',
+    deptId: '',
+    entryDate: '',
+    image: '',
+    exprList: []
+  }
 }
 //新增/修改表单
 const employee = ref({
@@ -189,6 +201,19 @@ watch(() => employee.value.exprList, (newVal, oldVal) => {
   )
   }
 }, { deep: true })//深度监听
+
+
+// 保存员工信息
+const save = async() => {
+  const result = await addApi(employee.value);
+  if (result.code) {//成功
+    ElMessage.success("保存成功");
+    dialogVisible.value = false;
+    search();
+  } else {//失败
+    ElMessage.error(result.msg);
+  }
+}
 
 </script>
 <!-- TODO: 员工管理增加 -->
@@ -403,7 +428,7 @@ watch(() => employee.value.exprList, (newVal, oldVal) => {
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="">保存</el-button>
+        <el-button type="primary" @click="save">保存</el-button>
       </span>
     </template>
   </el-dialog>
