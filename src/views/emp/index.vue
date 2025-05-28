@@ -134,6 +134,11 @@ const addEmp = () => {
     image: '',
     exprList: []
   }
+  //重置表单校验规则--提示信息
+  if (empFormRef.value) {
+    empFormRef.value.resetFields();
+  }
+
 }
 //新增/修改表单
 const employee = ref({
@@ -205,15 +210,59 @@ watch(() => employee.value.exprList, (newVal, oldVal) => {
 
 // 保存员工信息
 const save = async() => {
-  const result = await addApi(employee.value);
-  if (result.code) {//成功
-    ElMessage.success("保存成功");
-    dialogVisible.value = false;
-    search();
-  } else {//失败
-    ElMessage.error(result.msg);
+ 
+
+  //表单校验
+  if (!empFormRef.value) {
+    return;
+  } else {
+    empFormRef.value.validate(async (valid) => {//valid表示是否校验通过，true表示通过
+      if (valid) {//通过
+        const result = await addApi(employee.value);
+        if (result.code) {//成功
+          ElMessage.success("保存成功");
+          dialogVisible.value = false;
+          search();
+        } else {//失败
+          ElMessage.error(result.msg);
+        }
+      } else {
+        ElMessage.error('表单校验不通过');
+      }
+    })
   }
+
 }
+//表单引用
+const empFormRef = ref();
+
+
+//表单校验规则
+const rules = ref({
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 2, max: 20, message: '用户名长度应在2到20个字符之间', trigger: 'blur' }
+  ],
+  name: [
+    { required: true, message: '请输入姓名', trigger: 'blur' },
+    { min: 2, max: 10, message: '姓名长度应在2到10个字符之间', trigger: 'blur' }
+  ],
+  gender: [
+    { required: true, message: '请选择性别', trigger: 'change' }
+  ],
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+/**
+ * 正则表达式：
+ * 1.^：表示匹配字符串的开始位置
+ * 2.[3-9]：表示匹配1到9的数字
+ * 3.\d{9}：表示匹配9位数字
+ * 4.$：表示匹配字符串的结束位置
+ */
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入有效的手机号', trigger: 'blur' }
+  ]
+});
+
 
 </script>
 <!-- TODO: 员工管理增加 -->
@@ -299,18 +348,18 @@ const save = async() => {
   <!-- 新增/修改员工的对话框 -->
   <el-dialog v-model="dialogVisible" :title="dialogTitle">
     {{ employee }}
-    <el-form :model="employee" label-width="80px">
+    <el-form :model="employee" :rules="rules" ref="empFormRef" label-width="80px">
       <!-- 基本信息 -->
       <!-- 第一行 -->
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="用户名">
+          <el-form-item label="用户名" prop="username">
             <el-input v-model="employee.username" placeholder="请输入员工用户名，2-20个字"></el-input>
           </el-form-item>
         </el-col>
 
         <el-col :span="12">
-          <el-form-item label="姓名">
+          <el-form-item label="姓名" prop="name">
             <el-input v-model="employee.name" placeholder="请输入员工姓名，2-10个字"></el-input>
           </el-form-item>
         </el-col>
@@ -319,7 +368,7 @@ const save = async() => {
       <!-- 第二行 -->
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="性别">
+          <el-form-item label="性别" prop="gender">
             <el-select v-model="employee.gender" placeholder="请选择性别" style="width: 100%;">
               <el-option label="男" value="1"></el-option>
               <el-option label="女" value="2"></el-option>
@@ -328,7 +377,7 @@ const save = async() => {
         </el-col>
 
         <el-col :span="12">
-          <el-form-item label="手机号">
+          <el-form-item label="手机号" prop="phone">
             <el-input v-model="employee.phone" placeholder="请输入员工手机号"></el-input>
           </el-form-item>
         </el-col>
