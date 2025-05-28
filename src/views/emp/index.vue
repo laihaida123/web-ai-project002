@@ -1,7 +1,7 @@
 <script setup>
 import { watch } from 'vue';
 import { ref } from 'vue';
-import { queryPageApi, addApi } from '@/api/emp'
+import { queryPageApi, addApi, queryInfoApi, updateApi } from '@/api/emp'
 import { queryAllApi as queryAllDeptApi } from '@/api/dept'
 import { onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
@@ -218,7 +218,12 @@ const save = async() => {
   } else {
     empFormRef.value.validate(async (valid) => {//valid表示是否校验通过，true表示通过
       if (valid) {//通过
-        const result = await addApi(employee.value);
+        let result;
+        if (employee.value.id) {//修改
+          result = await updateApi(employee.value);
+        } else {//新增
+          result = await addApi(employee.value);
+        }        
         if (result.code) {//成功
           ElMessage.success("保存成功");
           dialogVisible.value = false;
@@ -263,6 +268,23 @@ const rules = ref({
   ]
 });
 
+// 编辑
+const edit = async (id) => {
+  const result = await queryInfoApi(id);
+  if (result.code) { 
+    dialogVisible.value = true;
+    dialogTitle.value = '修改员工';
+    employee.value = result.data;
+    
+    //对工作经历进行处理
+    let exprList = employee.value.exprList;
+    if (exprList && exprList.length > 0) { 
+      exprList.forEach((expr) => { 
+        expr.exprDate = [expr.begin, expr.end];
+      })
+    }
+  }
+}
 
 </script>
 <!-- TODO: 员工管理增加 -->
@@ -328,7 +350,7 @@ const rules = ref({
       <el-table-column prop="updateTime" label="最后操作时间" width="210" align="center"></el-table-column>
       <el-table-column label="操作" fixed="right" align="center">
         <template #default="scope">
-          <el-button size="small" type="primary" @click="">编辑</el-button>
+          <el-button size="small" type="primary" @click="edit(scope.row.id)">编辑</el-button>
           <el-button size="small" type="danger" @click="">删除</el-button>
         </template>
       </el-table-column>
