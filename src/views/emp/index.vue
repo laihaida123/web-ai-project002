@@ -305,6 +305,45 @@ const deleteById = (id) => {
     ElMessage.info('已取消删除');
   })
 }
+
+//记录单独删除员工得id
+const selectIds = ref([]);
+
+// 存储选中的 ID
+const selectedIds = ref([]);
+
+// 处理复选框选择变化的函数 -selection : 当前选中元素（数组）
+function handleSelectionChange(selection) {
+  const ids = selection.map(item => item.id);
+  selectedIds.value = ids;
+}
+
+
+
+//批量删除
+const deleteByIds = async () => {
+  //弹出一个确认框, 如果确认, 就删除;
+  ElMessageBox.confirm('确定删除选中员工吗?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    if (selectedIds.value && selectedIds.value.length > 0) {
+      // 删除员工
+      const result = await deleteApi(selectedIds.value);
+      if (result.code) {
+        ElMessage.success('删除员工成功');
+        search();
+      } else {
+        ElMessage.error(result.msg);
+      }
+    } else {
+      ElMessage.warning('请选择要删除的元素');
+    }
+  }).catch(() => {//取消
+    ElMessage.info('已取消删除');
+})
+}
 </script>
 <!-- TODO: 员工管理增加 -->
 <!-- 搜索栏 -->
@@ -336,12 +375,12 @@ const deleteById = (id) => {
   <!-- 功能按钮 -->
   <div class="container">
     <el-button class="button" type="primary" @click="addEmp"> + 新增员工</el-button>
-    <el-button class="button" type="danger" @click="clear"> + 批量删除</el-button>
+    <el-button class="button" type="danger" @click="deleteByIds"> + 批量删除</el-button>
   </div>
 
   <!-- 数据展示表格 -->
   <div class="container">
-    <el-table :data="empList" border style="width: 100%">
+    <el-table :data="empList" border style="width: 100%" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"></el-table-column>
       <el-table-column prop="name" label="姓名" width="120" align="center"></el-table-column>
       <el-table-column label="性别" width="170" align="center">
