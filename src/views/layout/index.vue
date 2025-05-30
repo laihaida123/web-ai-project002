@@ -36,7 +36,7 @@ const logout = () => {
     <el-container>
       <!-- Header 区域 -->
       <el-header class="header">
-        <span class="title">Tlias智能学习辅助系统</span>
+        <span class="title">sztu学生管理系统</span>
         <span class="right_tool">
           <a href="">
             <el-icon>
@@ -141,10 +141,13 @@ const logout = () => {
 </template>
 
 <style scoped>
-.header {
+/* .header {
   background-image: linear-gradient(to right, #00547d, #007fa4, #00aaa0, #00d072, #a8eb12);
+} */
+.header {
+  background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
-
 .title {
   color: white;
   font-size: 40px;
