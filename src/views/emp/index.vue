@@ -69,7 +69,7 @@ onMounted(() => {
 const getToken = () => {
   const loginUser = JSON.parse(localStorage.getItem('loginUser'));
   if (loginUser && loginUser.token) {
-    token = loginUser.token;
+    token.value = loginUser.token;
   }
 }
 
